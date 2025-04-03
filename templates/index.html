@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Healthcare Monitoring</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial; text-align: c<!DOCTYPE html>
+            <html>
+            <head>
+                <title>Smart Healthcare Monitoring</title>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <style>
+                    body { font-family: Arial, sans-serif; text-align: center; }
+                    table { margin: auto; border-collapse: collapse; width: 70%; }
+                    th, td { border: 1px solid black; padding: 8px; text-align: center; }
+                </style>
+            </head>
+            <body>
+                <h2>Smart Healthcare Monitoring System</h2>
+                
+                <canvas id="sensorChart" width="400" height="200"></canvas>
+                
+                <h3>Recent Readings</h3>
+                <table>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Acetone (ppm)</th>
+                        <th>Ethanol (ppm)</th>
+                        <th>Ammonia (ppm)</th>
+                        <th>Alert</th>
+                    </tr>
+                    {% for row in data %}
+                    <tr>
+                        <td>{{ row[4] }}</td>
+                        <td>{{ row[1] }}</td>
+                        <td>{{ row[2] }}</td>
+                        <td>{{ row[3] }}</td>
+                        <td style="color: {{ 'red' if row[4] == 'Alert! High VOC Levels' else 'green' }}">{{ row[4] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </body>
+            </html>
+            enter; }
+        table { margin: auto; border-collapse: collapse; width: 70%; }
+        th, td { border: 1px solid black; padding: 8px; text-align: center; }
+    </style>
+</head>
+<body>
+    <h2>Smart Healthcare Monitoring System</h2>
+    <canvas id="sensorChart" width="400" height="200"></canvas>
+    <h3>Recent Readings</h3>
+    <table>
+        <tr>
+            <th>Timestamp</th>
+            <th>Acetone (ppm)</th>
+            <th>Ethanol (ppm)</th>
+            <th>Ammonia (ppm)</th>
+            <th>Status</th>
+        </tr>
+        {% for row in data %}
+        <tr>
+            <td>{{ row[5] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+            <td>{{ row[4] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <script>
+        var ctx = document.getElementById("sensorChart").getContext("2d");
+        var data = {
+            labels: [{% for row in data %}"{{ row[5] }}",{% endfor %}],
+            datasets: [
+                { label: "Acetone", data: [{% for row in data %}{{ row[1] }}, {% endfor %}], borderColor: "blue", fill: false },
+                { label: "Ethanol", data: [{% for row in data %}{{ row[2] }}, {% endfor %}], borderColor: "red", fill: false },
+                { label: "Ammonia", data: [{% for row in data %}{{ row[3] }}, {% endfor %}], borderColor: "green", fill: false }
+            ]
+        };
+        new Chart(ctx, { type: "line", data: data });
+    </script>
+</body>
+</html>
