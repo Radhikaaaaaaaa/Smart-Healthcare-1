@@ -3,82 +3,437 @@
 <head>
     <title>Smart Healthcare Monitoring</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body { font-family: Arial; text-align: c<!DOCTYPE html>
-            <html>
-            <head>
-                <title>Smart Healthcare Monitoring</title>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                <style>
-                    body { font-family: Arial, sans-serif; text-align: center; }
-                    table { margin: auto; border-collapse: collapse; width: 70%; }
-                    th, td { border: 1px solid black; padding: 8px; text-align: center; }
-                </style>
-            </head>
-            <body>
-                <h2>Smart Healthcare Monitoring System</h2>
-                
-                <canvas id="sensorChart" width="400" height="200"></canvas>
-                
-                <h3>Recent Readings</h3>
-                <table>
-                    <tr>
-                        <th>Timestamp</th>
-                        <th>Acetone (ppm)</th>
-                        <th>Ethanol (ppm)</th>
-                        <th>Ammonia (ppm)</th>
-                        <th>Alert</th>
-                    </tr>
-                    {% for row in data %}
-                    <tr>
-                        <td>{{ row[4] }}</td>
-                        <td>{{ row[1] }}</td>
-                        <td>{{ row[2] }}</td>
-                        <td>{{ row[3] }}</td>
-                        <td style="color: {{ 'red' if row[4] == 'Alert! High VOC Levels' else 'green' }}">{{ row[4] }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </body>
-            </html>
-            enter; }
-        table { margin: auto; border-collapse: collapse; width: 70%; }
-        th, td { border: 1px solid black; padding: 8px; text-align: center; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h2 {
+            color: darkblue;
+            margin-bottom: 20px;
+            margin-right: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .patient-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: 8px;
+            text-align: left;
+        }
+        
+        .info-group {
+            flex-basis: 30%;
+            margin-bottom: 10px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        input[type="text"], 
+        input[type="number"], 
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .chart-container {
+            margin: 20px 0;
+            height: 300px;
+        }
+        
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 100%;
+            background-color: white;
+        }
+        
+        th {
+            background-color: #4682b4;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        td {
+            border: 1px solid #ddd;
+            padding: 10px 8px;
+            text-align: center;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .alert {
+            color: red;
+            font-weight: bold;
+        }
+        
+        .normal {
+            color: green;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background-color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background-color: #4682b4;
+            color: white;
+        }
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn-logout {
+            background-color: #ff6347;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-logout:hover {
+            background-color: #e5533d;
+        }
+        
+        
+        .btn {
+            background-color: #4682b4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #3a6d94;
+        }
+        
+        .btn-update {
+            background-color: #28a745;
+        }
+        
+        .btn-download {
+            background-color: #dc3545;
+            .btn-logout {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                background-color: #ff6347;
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+            
+
+            
+        }
     </style>
 </head>
 <body>
-    <h2>Smart Healthcare Monitoring System</h2>
-    <canvas id="sensorChart" width="400" height="200"></canvas>
-    <h3>Recent Readings</h3>
-    <table>
-        <tr>
-            <th>Timestamp</th>
-            <th>Acetone (ppm)</th>
-            <th>Ethanol (ppm)</th>
-            <th>Ammonia (ppm)</th>
-            <th>Status</th>
-        </tr>
-        {% for row in data %}
-        <tr>
-            <td>{{ row[5] }}</td>
-            <td>{{ row[1] }}</td>
-            <td>{{ row[2] }}</td>
-            <td>{{ row[3] }}</td>
-            <td>{{ row[4] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    
+
+    <div class="container" id="reportContent">
+        <div class="header-bar">
+            <h2>Smart Healthcare Monitoring System</h2>
+            <button class="btn btn-logout" onclick="logout()">Logout</button>
+        </div>
+        
+        
+        <div class="patient-info">
+            <div class="info-group">
+                <span class="info-label">Patient Name:</span>
+                <input type="text" id="patientName" placeholder="Enter patient name">
+            </div>
+            <div class="info-group">
+                <span class="info-label">Patient ID:</span>
+                <input type="text" id="patientId" placeholder="Enter patient ID">
+            </div>
+            <div class="info-group">
+                <span class="info-label">Age:</span>
+                <input type="number" id="patientAge" placeholder="Enter age" min="0" max="120">
+            </div>
+            <div class="info-group">
+                <span class="info-label">Gender:</span>
+                <select id="patientGender">
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="info-group">
+                <span class="info-label">Blood Group:</span>
+                <select id="bloodGroup">
+                    <option value="">Select blood group</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                </select>
+            </div>
+            <div class="info-group">
+                <span class="info-label">Phone Number:</span>
+                <input type="text" id="phoneNumber" placeholder="Enter phone number">
+            </div>
+        </div>
+        
+        <button class="btn btn-update" onclick="updatePatientInfo()">Update Patient Info</button>
+        
+        
+        <div id="voc" class="tab-content">
+            <div class="chart-container">
+                <canvas id="sensorChart"></canvas>
+            </div>
+            
+            <h3>Recent VOC Readings</h3>
+            <table>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Acetone (ppm)</th>
+                    <th>Ethanol (ppm)</th>
+                    <th>Ammonia (ppm)</th>
+                    <th>Status</th>
+                </tr>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row[5] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                    <td>{{ row[3] }}</td>
+                    <td class="{{ 'alert' if 'Alert' in row[4] else 'normal' }}">{{ row[4] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    
+    <button class="btn btn-download" onclick="downloadPDF()">Download as PDF</button>
+    
     <script>
+        // Update patient info
+        function updatePatientInfo() {
+            // You can add validation here
+            alert("Patient information updated successfully!");
+        }
+        
+        // Setup chart
         var ctx = document.getElementById("sensorChart").getContext("2d");
-        var data = {
-            labels: [{% for row in data %}"{{ row[5] }}",{% endfor %}],
-            datasets: [
-                { label: "Acetone", data: [{% for row in data %}{{ row[1] }}, {% endfor %}], borderColor: "blue", fill: false },
-                { label: "Ethanol", data: [{% for row in data %}{{ row[2] }}, {% endfor %}], borderColor: "red", fill: false },
-                { label: "Ammonia", data: [{% for row in data %}{{ row[3] }}, {% endfor %}], borderColor: "green", fill: false }
-            ]
-        };
-        new Chart(ctx, { type: "line", data: data });
+        
+        // Process data from backend for chart
+        function setupChart() {
+            // Extract data from the table rows for the chart
+            const vocTable = document.querySelector('#voc table');
+            if (!vocTable) return;
+            
+            const rows = vocTable.querySelectorAll('tbody tr');
+            if (!rows || rows.length === 0) return;
+            
+            const times = [];
+            const acetoneValues = [];
+            const ethanolValues = [];
+            const ammoniaValues = [];
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 5) {
+                    times.push(cells[0].textContent.trim());
+                    acetoneValues.push(parseFloat(cells[1].textContent));
+                    ethanolValues.push(parseFloat(cells[2].textContent));
+                    ammoniaValues.push(parseFloat(cells[3].textContent));
+                }
+            });
+            
+            // Create chart with the extracted data
+            const chartData = {
+                labels: times,
+                datasets: [
+                    { label: "Acetone", data: acetoneValues, borderColor: "blue", tension: 0.1, fill: false },
+                    { label: "Ethanol", data: ethanolValues, borderColor: "red", tension: 0.1, fill: false },
+                    { label: "Ammonia", data: ammoniaValues, borderColor: "green", tension: 0.1, fill: false }
+                ]
+            };
+            
+            new Chart(ctx, { 
+                type: "line", 
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Concentration (ppm)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Setup the chart with backend data
+            setupChart();
+        });
+
+        function logout() {
+            // Redirect to login page or clear session
+            alert("Logged out successfully!");
+            window.location.href = "/login"; // Update this path as per your app structure
+        }
+        
+        
+        // Download as PDF function
+        function downloadPDF() {
+            // Show loading message
+            alert("Preparing PDF download...");
+            
+            // Create a copy of both tables for the PDF
+            const pdfContent = document.createElement('div');
+            pdfContent.style.padding = '20px';
+            pdfContent.style.backgroundColor = 'white';
+            
+            // Add title and patient info
+            const title = document.createElement('h2');
+            title.textContent = 'Smart Healthcare Monitoring Report';
+            pdfContent.appendChild(title);
+            
+            // Add patient information
+            const patientInfoDiv = document.createElement('div');
+            patientInfoDiv.style.marginBottom = '20px';
+            patientInfoDiv.style.padding = '10px';
+            patientInfoDiv.style.border = '1px solid #ddd';
+            patientInfoDiv.style.borderRadius = '5px';
+            
+            const patientName = document.getElementById('patientName').value || 'Not specified';
+            const patientId = document.getElementById('patientId').value || 'Not specified';
+            const patientAge = document.getElementById('patientAge').value || 'Not specified';
+            const patientGender = document.getElementById('patientGender').value || 'Not specified';
+            const bloodGroup = document.getElementById('bloodGroup').value || 'Not specified';
+            const phoneNumber = document.getElementById('phoneNumber').value || 'Not specified';
+            
+            patientInfoDiv.innerHTML = `
+                <h3>Patient Information</h3>
+                <p><strong>Name:</strong> ${patientName}</p>
+                <p><strong>ID:</strong> ${patientId}</p>
+                <p><strong>Age:</strong> ${patientAge}</p>
+                <p><strong>Gender:</strong> ${patientGender}</p>
+                <p><strong>Blood Group:</strong> ${bloodGroup}</p>
+                <p><strong>Phone Number:</strong> ${phoneNumber}</p>
+            `;
+            pdfContent.appendChild(patientInfoDiv);
+            
+            // Add VOC Monitoring section
+            const vocTitle = document.createElement('h3');
+            vocTitle.textContent = 'VOC Monitoring Data';
+            pdfContent.appendChild(vocTitle);
+            
+            // Clone the VOC table
+            const vocTable = document.querySelector('#voc table').cloneNode(true);
+            pdfContent.appendChild(vocTable);
+            
+            // Add timestamp
+            const timestampP = document.createElement('p');
+            const now = new Date();
+            timestampP.textContent = 'Report generated on: ' + now.toLocaleString();
+            timestampP.style.marginTop = '20px';
+            timestampP.style.fontSize = '12px';
+            timestampP.style.color = '#666';
+            pdfContent.appendChild(timestampP);
+            
+            // Temporarily add to document (hidden) to render
+            pdfContent.style.position = 'absolute';
+            pdfContent.style.left = '-9999px';
+            document.body.appendChild(pdfContent);
+            
+            // Generate PDF
+            const { jsPDF } = window.jspdf;
+            
+            html2canvas(pdfContent).then(canvas => {
+                document.body.removeChild(pdfContent); // Clean up
+                
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                
+                // Create a clean filename
+                let filename = document.getElementById('patientName').value || 'patient';
+                filename = filename.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                
+                // Generate timestamp for the filename
+                const date = new Date();
+                const timestamp = date.toISOString().split('T')[0];
+                
+                // Download the PDF
+                pdf.save('healthcare_report_' + filename + '_' + timestamp + '.pdf');
+            });
+        }
     </script>
 </body>
 </html>

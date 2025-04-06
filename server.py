@@ -1,4 +1,5 @@
-from flask import Flask, request, render_template
+# Add 'redirect' to your import statement
+from flask import Flask, request, render_template, redirect, url_for
 import sqlite3
 import smtplib
 
@@ -25,7 +26,21 @@ def init_db():
     conn.close()
 
 init_db()
+# Add login route
+@app.route("/login", methods=["GET", "POST"])
 
+def login():
+    error = None
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        
+        if username == "admin" and password == "admin":
+            return redirect(url_for('index'))
+        else:
+            error = "Invalid credentials. Please try again."
+    
+    return render_template("login.html", error=error)
 @app.route("/")
 def index():
     conn = sqlite3.connect("health_data.db")
